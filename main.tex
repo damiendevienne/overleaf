@@ -1,0 +1,133 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+\usepackage{setspace} 
+\usepackage[modulo]{lineno}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\title{\textsc{Phylter}: visualization, detection and filtering of phylogenomics tree forests}
+\title{Three way metric multidimensional scaling on phylogenetic distance matrices allows efficient identification of outlier sequences in phylogenomics datasets}
+\author[1]{Aurore Comte}
+\author[1]{Théo Tricou}
+\author[1]{Eric Tannier}
+\author[1]{Aurélie Siberchicot?}
+\author[1]{Stéphane Dray}
+\author[1,*]{Damien M. de~Vienne}
+
+\affil[1]{Univ Lyon, Université Lyon 1, CNRS, Laboratoire de Biométrie et Biologie Évolutive
+UMR5558, F-69622 Villeurbanne, France}
+\affil[*]{Corresponding author: damien.de-vienne@univ-lyon1.fr}
+\date{}
+
+%\usepackage[backend=biber,style=authoryear,sorting=ynt]{biblatex}
+\usepackage{biblatex}
+\bibliography{references}
+
+\usepackage{graphicx}
+\usepackage[T1]{fontenc} %Allows small caps in section titles
+
+\usepackage{xcolor}
+
+\begin{document}
+
+\maketitle
+
+\doublespacing
+\linenumbers
+\textit{ORDRE DES AUTEURS NON DÉFINITIF}
+\begin{abstract}
+In phylogenomics, incongruences between genes trees, resulting from both artifactual and biological reasons, are known to decrease the signal-to-noise ratio and complicate species tree inference. The amount of data analyzed nowadays in classical analyses prevents any manual detection and curation of errors in such phylogenomics datasets and a standard for the quality control of phylogenomics datasets is still lacking. 
+Here we present \textsc{Phylter}, a method that allows a rapid and accurate detection of outlier gene/species pairs, rogue taxa and outlier genes. \textsc{Phylter} relies on Distatis, an extension of multidimensional scaling to 3 dimensions to compare multiple distance matrices at once. Distance matrices are obtained either directly from multiple sequence alignments, or are extracted from individual gene phylogenies. 
+
+Using \textsc{Phylter} on three datasets, one simulated and two biological ones, we show that it correctly identifies outliers (consisting of sequences that have been horizontally transferred, that are more prone to be hidden paralogs, or that are known to be poor markers for phylogenetic inference) whose removal increases the quality of reconstructed species trees. Thanks to the generation of numerous graphical outputs, \textsc{Phylter} also allows the rapid and easy characterisation of the dataset at hand, thus easing the identification of possible problems. \textsc{Phylter} is distributed as an R package at http://xxxxx. 
+\end{abstract}
+
+\section{Introduction}
+
+Supermatrix and supertree approaches are commonly used in phylogenomics to obtain a species tree from a collection of genes. Both methods are similar in their first steps: for a list of taxa of interest, the largest possible collection of orthologous gene sequences is retrieved and a multiple sequence alignment (MSA)  is computed for each cluster of orthologous genes. The methods then differ by the strategy employed. In the supermatrix approach, MSAs are concatenated into a supermatrix that is used to build a phylogeny, generally with ML or Bayesian approaches. In the supertree approach, individual gene trees are build from individual MSAs and a species trees is obtained by combining them all (ADD REFS). 
+Whatever the method employed, incongruities between individual gene histories and the history of the species carrying these genes will negatively impact the quality (accuracy) of the species tree obtained \cite{philippe2017pitfalls}. Methods to clean datasets prior to such analyses are thus required, but no standard for such cleaning has been proposed so far \cite{philippe2017pitfalls}. 
+
+In 2012, we proposed a first approach, Phylo-MCOA, that was able to jointly detect outliers species (rogue taxa), outlier genes, and outlier gene/species associations \cite{deVienne_2012_phylomcoa}. The method was based on Multiple Co-inertia Analysis, applied to phylogenetic distance matrices. \textcolor{orange}{DESCRIBE MORE AND EXPLAIN WHY IT IS NOT GOOD TO USE MCOA AND WHY DISTATIS IS A BEST OPTION?}
+
+
+Here we present \textsc{Phylter}, a method that can accurately and rapidly identify  outlier genes, species, and specific gene/species associations. By using it on three different datasets, one simulated and two biological ones, we show that it identifies outlier sequences that are accurately validated as such by other indirect evidence. For the simulated dataset, outliers are gene sequences that have been horizontally transferred. For the mammal dataset, outliers are gene sequences that are AT-rich (as shown in \cite{romiguier_2013}) or/and whose physical vicinity along the chromosome (i.e. synteny) is distinct from its orthologous counterpart. 
+
+
+
+\section{Material and Methods}
+\subsection{The \textsc{Phylter} method}
+The \textsc{Phylter} method, in its entirety, is depicted in Figure \ref{fig:method}. It starts with \textit{K} distance matrices corresponding to \textit{K} genes, that can be obtained either by computing pairwise distances (sum of branch lengths) between species in  each gene tree, or directly from each gene multiple sequence alignment (MSA). All the matrices are then given the same dimensionality, using the mean values to impute missing data if any. From these \textit{K} matrices, a first Distatis analysis is performed, as initially proposed in \cite{abdi2005distatis,abdi2012_distatis_review}. \textcolor{orange}{In brief...  STEPHANE, tu peux faire une petite description ici~? } 
+
+%\textsc{Phylter} performs iterative Distatis \cite{abdi2005distatis,abdi2012_distatis_review} analyses, identifying each time the outlier sequences, and removing them from the distance matrices until no gain is possible (Figure \ref{fig:method}).
+
+%%REFS importante MDS et DISTATIS
+%% https://s3.amazonaws.com/academia.edu.documents/39865138/abdi-distatis2005.pdf?response-content-disposition=inline%3B%20filename%3DDISTATIS_The_Analysis_of_Multiple_Distan.pdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWOWYYGZ2Y53UL3A%2F20200310%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200310T150057Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=92618293652d7fcffa47a56b6c544233f022d86b6385c353ed03f760bce28950]
+%% https://personal.utdallas.edu/~herve/Abdi-MDS2007-pretty.pdf
+
+\begin{figure}
+    \includegraphics[width=0.9\textwidth]{fig/method_2.pdf}
+    \caption{The \textsc{phylter} method, based on Distatis}
+    \label{fig:method}
+\end{figure} 
+
+\subsection{Datasets}
+We used three datasets to test the ability of \textsc{Phylter} to correctly detect outliers and to evaluate the improvement in species tree quality after filtering them out.
+First, we simulated species and gene trees using the software Zombi \cite{davin_2019}, as follows. \textcolor{orange}{todo and to define}
+
+to simulate species and gene trees, varying various parameters: probability of horizontal gene transfer, duplication rate and extinction rate. \textcolor{red}{TODO AND TODEFINE}
+\textsc{Phylter} was tested against the Orthomam database (v10b), containing 14509 orthologous CDS markers for up to 116 mammal species \cite{orthomam_2019}. 
+We build a comprehensive dataset of rhizobial sequences to test phylter. On this same dataset, ALE was used to detect horizontally transfered genes. 
+
+\subsection{Evaluation of outliers detected}
+We compared the set of outliers detected by phylter to two orthogonal information: the level of synteny conservation of genes and the AT-richness of genes. Indeed, it was 
+\subsubsection*{Synteny scores}
+We wanted to know whether the sequences detected as outliers by \textsc{Phylter} were enriched in sequences that had a vicinity (synteny) in the genome that was different from the vicinity of non-outlier sequences. To achieve this, we needed a score by gene and by species summarizing whether or not this gene had right and left neighbor similar or not to the neighbors of the same gene in the other species. We restricted the analysis to mammal genomes whose assembly was good enough (??How much species remaining?). 
+WHAT WAS THE COMPUTATION PERFORMED? CHECK WITH ERIC.  
+\subsubsection*{GC content}
+\subsubsection*{Horizontal transfers detection}
+
+
+\section{Results}
+
+
+\subsection{The use of \textsc{Phylter} improves the topology and the branch length of reconstructed species trees}
+\subsection{\textsc{Phylter} is fast}
+\subsection{\textsc{Phylter}ed sequences are enriched in sequences identified as horizontally transferred or duplicated}
+ Bla bla bla 
+
+\begin{figure}
+    \includegraphics[width=0.3\textwidth]{fig/mammals-boxplot_EDITED.png}
+  \caption{Mean GC3-content and synteny scores of sequences, either identified as outliers by \textsc{Phylter} (blue) or randomly sampled (red)}
+\end{figure} 
+
+
+\subsection{\textsc{Phylter}ed sequences are enriched in genes that are not syntenic to their homologous genes in other species}
+
+\subsection{\textsc{Phylter}ed sequences are enriched in known bad markers}
+
+
+\section{Conclusion}
+
+
+\printbibliography
+
+\newpage
+\input{suppmat.tex}
+
+
+\section{poubelle}
+Supermatrix-based methods, \textit{i.e.} the concatenation of multiple gene sequence alignments prior to phylogenetic inference, remains one of the preferred approach in phylogenomics. However, incongruences between individual genes trees, resulting from both artefactual and biological reasons, are known to decrease the signal-to-noise ratio and complicate species tree inferences. The amount of data analyzed nowadays in classical phylogenomics analyses prevent the manual detection and curation of errors in alignments or trees. We propose here a fast and accurate methods that compares multiple phylogenetic trees, detects all types of outliers, and returns a list of rogue taxa, outlier genes, and gene/species associations whose removal improves greatly the reconstructed species tree. The method, based on Distatis (a generalization of classical MDS)  is close in its principle to its predecessor Phylo-MCOA, but is faster by two orders of magnitude, does not depend on arbitrary threshold values, and is more accurate. 
+
+To test the ability of \textsc{Phylter} to correctly filter out incongruent signal in phylogenomics data, six datasets were simulated with SimPhy \cite{mallo2016simphy}, starting with parameters used on \cite{bayzid2015weighted}. with to create created six datasets varying in the degree of ILS and the frequency of Horizontal gene transfers. For each simulated dataset (Sim1 to Sim6, see below), we made 20 replicates, that is 20 species trees, and simulated along its  
+
+In addition, the identification of these incongruities, i.e. the sequences or species that are outliers with respect to the rest of the data, are of great interest for better characterizing the reasons (errors or evolutionary events) that made them outliers. 
+
+
+\subsubsection{Sim1 : ILS soft}
+
+
+\subsubsection{Sim2 : ILS strong}
+\subsubsection{Sim5 : ILS soft + HGT soft}
+\subsubsection{Sim6 : ILS soft + HGT strong}
+\subsubsection{Sim7 : ILS strong + HGT soft}
+\subsubsection{Sim8 : ILS strong + HGT strong}
+\end{document}

@@ -1,0 +1,41 @@
+\section*{Supplementary material}
+
+
+%copy from "weighted binning paper" : 
+%We used simPhy [33] to simulate species trees using the Yule process with two different maximum tree length settings: 200K generations, resulting in short trees and high levels of ILS, and 1.8M generations, resulting in relatively longer trees and lower levels of ILS. We generated 20 species trees per model condition, and used simPhy to simulate 200 gene trees for each species trees using the multi-species coalescent process (simPhy parameters and commands are given in S14 Fig). The gene trees (with branch lengths in substitution units) deviate from the strict molecular clock, and the rates of evolution vary across genes. We used Indelible to simulate GTR+Γ sequence evolution down these gene trees with 100 sites, with parameters given in S14 Fig.
+
+simphy 
+-RS 20 -> nb of replicates of the whole stuff
+-RL F:1000 -> 1000 loci (on which genes will be evolved)
+-RG 1 -> nb of genes per locus
+-ST F:200000 -> nb of generations. 200000 for lots of ILS, 1800000 for less ILS. 
+-SB U:0.0000001,0.000001 -> birth rate varies between 1e-6 and 1e-7
+-SI F:1 -> individuals per species 
+-SL F:100 -> number of leaves (taxa)
+-SP F:400000 -> Eff haploid pop size
+-HS LN:1.5,1 -> Species-specific branch rate heterogeneity modifiers.
+-HL LN:1.2,1 -> Gene-family-specific rate heterogeneity modifiers.
+-HG LN:1.4,1 -> Gene-by-lineage-specific rate heterogeneity modifiers.
+-HH F:1 -> Gene-by-lineage-specific rate heterogeneity modifiers.
+-SU E:10000000 -> tree-wide substitution rate
+-SO F:1 -> Ratio between ingroup height and the branch from the root to the ingroup.
+-V 3 -> Verbosity
+-CS 1234
+-O SIMUTEST
+
+simphy -RS 1 -RL F:1000 -RG 1 -ST F:2000000 -SB F:0.0000001 -SI F:1 -SL F:100 -SP F:400000 -HS LN:1.5,1 -HL LN:1.2,1 -HG LN:1.4,1 -HH F:1 -SU E:10000000 -SO F:1 -V 3 -CS 1234 -O SIMU
+
+
+
+
+simphy -rs 1 -rl f:200 -rg 1 
+-sb f:0.0000001 -sd f:0 -st ln:14.70055,0.25 -sl f:100 -so f:1 -si f:1 -sp f:4000000 -su ln:-17.27461,0.6931472 
+-hh f:1 -hs ln:1.5,1 -hl ln:1.551533,0.6931472 -hg ln:1.5,1 -cs 9644 -v 3 -o ILS1 -ot 0 -op 1 -od 1 \\
+
+
+-rs replicates -> 20 species tree generated \\
+-rl of locus -> 200 loci simulated each time \\
+-rg 1 -> 1 gene per locus \\
+-sb f:0.0000001 -> birth rate for species tree nb of birth per time unit (10E-7) = 1 birth every 10E7 generations \\
+-sd f:0 -> no death \\
+-st ln:14.70055,0.25 -> lognormal sampling of the species tree height (in time unit)
